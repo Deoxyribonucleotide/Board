@@ -1,59 +1,50 @@
-#include <SFML/Graphics.hpp>
-#include<SFML/Network.hpp>
-
-using namespace sf;
+#include"Client.h"
 
 int main()
 {
-    RenderWindow window(VideoMode(1000, 600), "Board");
-    CircleShape shape(8);
-    shape.setFillColor(Color::Green);
+    RenderWindow window(VideoMode(800, 600), "Board");
 
     RenderTexture texture;
-    texture.create(1000, 600);
+    texture.create(800, 600);
     texture.clear(Color::White);
-    
 
+    Client client(&texture, &window);
+   
     Sprite spr(texture.getTexture());
+    int index = 0;
 
-    Vector2i pixelPos = Mouse::getPosition(window);
-    Vector2f pos = window.mapPixelToCoords(pixelPos);
-
-    int x = 0, y = 0;
-    bool draw = true;
-
+    thread th([] {&Client::Draw; });
+    thread thColors([] {&Client::ChangeColor; });
+    
     while (window.isOpen())
     {
-        Vector2i pixelPos = Mouse::getPosition(window);
-        Vector2f pos = window.mapPixelToCoords(pixelPos);
+        client.GetMousePos();
         Event event;
+
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
-                window.close();
-            if (Keyboard::isKeyPressed(Keyboard::B))
-                shape.setFillColor(Color::Blue);
-
-            if (Keyboard::isKeyPressed(Keyboard::Q))
-                texture.clear(Color::White);
-            
-            if (event.type == Event::MouseButtonPressed)
-               if (event.key.code == Mouse::Right)
-                    draw = !draw;
-                
-            if (draw)
             {
-                x = pos.x;
-                y = pos.y;
-                shape.setPosition(x, 600 -y);
-                texture.draw(shape); 
-            }  
+                thColors.join();
+                th.join();
+                window.close();
+            }
+
+            /*if (event.type == Event::MouseButtonPressed)
+                if (event.key.code == Mouse::Left)
+                {
+                    client.SetRectanglePos(index);
+                    texture.draw(client.GetRectangle(index));
+                }*/
+            if (client.GetDraw())
+            {
+                client.FillPacket();
+                client.SendCoordinates();
+            } 
         }
         window.clear();
-
         window.draw(spr);
         window.display();
     }
-
     return 0;
 }
