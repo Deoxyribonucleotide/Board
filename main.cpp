@@ -13,8 +13,8 @@ int main()
     Sprite spr(texture.getTexture());
     int index = 0;
 
-    thread th([] {&Client::Draw; });
-    thread thColors([] {&Client::ChangeColor; });
+    thread th([&client]() {client.Draw(); });
+    thread thColors([&client]() {client.ChangeColor(); });
     
     while (window.isOpen())
     {
@@ -25,8 +25,8 @@ int main()
         {
             if (event.type == Event::Closed)
             {
-                thColors.join();
-                th.join();
+                thColors.detach();
+                th.detach();
                 window.close();
             }
 

@@ -68,6 +68,7 @@ void Client::FillPacket()
 
 void Client::ChangeColor()
 {
+    cout << "thread color" << endl;
     while (true)
     {
         if (Keyboard::isKeyPressed(Keyboard::G))
@@ -88,6 +89,7 @@ void Client::ChangeColor()
 
 void Client::Draw()
 {
+    cout << "thread draw" << endl;
     while (true)
     {
         rectangles[0].setPosition(mouseX, 600 - mouseY);
