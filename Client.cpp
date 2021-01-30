@@ -2,21 +2,21 @@
 
 Client::Client(RenderTexture* texture, RenderWindow* window)
 {
-    
+    rect.setSize(Vector2f(2, 2));
+    rect.setFillColor(Color::Red);
     for (int i = 0; i < 10; i++)
     {
         rectangles.push_back(rect);
     }
-    rectangles[0].setSize(Vector2f(2, 2));
     color = Color::Black;
     rectangles[0].setFillColor(color);
 
     IP = IpAddress::getLocalAddress();
     cout << IP << endl;
-    port = Socket::AnyPort;
-    socket.bind(port);
+    port = 3000;
     socket.setBlocking(false);
-    cout << socket.getLocalPort() << endl;;
+    cout << socket.getLocalPort() << endl;
+    socket.connect(IP, port);
 
     Pos2.x = 0;
     Pos2.y = 0;
@@ -55,7 +55,7 @@ void Client::SetRectanglePos(int index)
 
 void Client::SendCoordinates()
 {
-    socket.send(packet,IP,2000);
+    socket.send(packet);
     cout << packet.getDataSize() << " ";
     packet.clear();
 }
@@ -63,7 +63,6 @@ void Client::SendCoordinates()
 void Client::FillPacket()
 {
     packet << mouseX << mouseY;
-    //color
 }
 
 void Client::ChangeColor()
@@ -97,15 +96,16 @@ void Client::Draw()
     } 
 }
 
-/*bool Client::ReceiveCoordinates() //mb in other thread
+void Client::ReceiveCoordinates()
 {
-    socket.receive(packet2, IP, serverport);
-    if (packet2 >> Pos2.x >> Pos2.y)
+    while (true)
     {
-        shape2.setPosition(Pos2.x, 600 - Pos2.y);
-        packet2.clear();
-        return 1;
+        socket.receive(packet2);
+        if (packet2 >> Pos2.x >> Pos2.y)
+        {
+            rectangles[1].setPosition(Pos2.x, 600 - Pos2.y);
+            packet2.clear();
+            texture->draw(rectangles[1]);
+        }
     }
-    
-    return 0;
-}*/
+}

@@ -3,6 +3,7 @@
 #include<iostream>
 #include<vector>
 #include<thread>
+#include<string>
 #pragma once
 
 using namespace sf;
@@ -26,7 +27,7 @@ public:
 
 	void SendCoordinates();
 
-	bool ReceiveCoordinates();
+	void ReceiveCoordinates();
 
 	void FillPacket();
 
@@ -51,12 +52,13 @@ private:
 	RenderWindow *window;
 
 	IpAddress IP;
-	UdpSocket socket;
+	TcpSocket socket;
 	int port;
 	unsigned short serverport = 2000;
 
 	Packet packet;
 	Packet packet2;
+	//string str;
 
 	Color color;
 };

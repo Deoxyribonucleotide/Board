@@ -15,6 +15,7 @@ int main()
 
     thread th([&client]() {client.Draw(); });
     thread thColors([&client]() {client.ChangeColor(); });
+    //thread thReceiving([&client]() {client.ReceiveCoordinates(); });
     
     while (window.isOpen())
     {
@@ -27,6 +28,7 @@ int main()
             {
                 thColors.detach();
                 th.detach();
+                //thReceiving.detach();
                 window.close();
             }
 
