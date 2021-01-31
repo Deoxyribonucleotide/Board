@@ -1,16 +1,11 @@
 #include "Client.h"
 
-Client::Client(RenderTexture* texture, RenderWindow* window)
+Client::Client()
 {
-    rect.setSize(Vector2f(2, 2));
-    rect.setFillColor(Color::Red);
     for (int i = 0; i < 10; i++)
     {
         rectangles.push_back(rect);
     }
-    color = Color::Black;
-    rectangles[0].setFillColor(color);
-
     IP = IpAddress::getLocalAddress();
     cout << IP << endl;
     port = 3000;
@@ -18,19 +13,11 @@ Client::Client(RenderTexture* texture, RenderWindow* window)
     cout << socket.getLocalPort() << endl;
     socket.connect(IP, port);
 
-    Pos2.x = 0;
-    Pos2.y = 0;
-    
-    this->texture = texture;
-    this->window = window;
 }
 
-void Client::GetMousePos()
+void Client::GetMousePos(RenderWindow* window)
 {
-    pixelPos = Mouse::getPosition(*window);
-    Pos = window->mapPixelToCoords(pixelPos);
-    mouseX = Pos.x;
-    mouseY = Pos.y;
+    rectangles[0].GetMousePos(window);
 }
 
 bool Client::GetDraw()
@@ -45,58 +32,43 @@ void Client::ChangeDraw()
 
 RectangleShape Client::GetRectangle(int index)
 {
-    return rectangles[index];
+    return rectangles[index].GetRectangle();
 }
 
 void Client::SetRectanglePos(int index)
 {
-    rectangles[index].setPosition(mouseX, 600 - mouseY);
+    rectangles[index].SetRectanglePos();
 }
 
 void Client::SendCoordinates()
 {
     socket.send(packet);
-    cout << packet.getDataSize() << " ";
     packet.clear();
 }
-
-void Client::FillPacket()
+//fill packet
+/*void Client::FillPacket()
 {
     packet << mouseX << mouseY;
-}
+}*/
 
-void Client::ChangeColor()
+void Client::ChangeColor(RenderTexture* texture)
 {
     cout << "thread color" << endl;
-    while (true)
-    {
-        if (Keyboard::isKeyPressed(Keyboard::G))
-            rectangles[0].setFillColor(Color::Green);
-
-        if (Keyboard::isKeyPressed(Keyboard::R))
-            rectangles[0].setFillColor(Color::Red);
-
-        if (Keyboard::isKeyPressed(Keyboard::B))
-            rectangles[0].setFillColor(Color::Blue);
-
-        if (Keyboard::isKeyPressed(Keyboard::Q))
-            texture->clear(Color::White);
-    
-        this->color = rectangles[0].getFillColor();
-    }
+    while (1)
+        rectangles[0].ChangeColor(texture);
 }
 
-void Client::Draw()
+void Client::Draw(RenderTexture* texture)
 {
     cout << "thread draw" << endl;
     while (true)
     {
-        rectangles[0].setPosition(mouseX, 600 - mouseY);
-        texture->draw(rectangles[0]);
+        rectangles[0].SetRectanglePos();
+        texture->draw(rectangles[0].GetRectangle());
     } 
 }
 
-void Client::ReceiveCoordinates()
+/*void Client::ReceiveCoordinates()
 {
     while (true)
     {
@@ -108,4 +80,4 @@ void Client::ReceiveCoordinates()
             texture->draw(rectangles[1]);
         }
     }
-}
+}*/

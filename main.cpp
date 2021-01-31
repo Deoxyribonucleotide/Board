@@ -8,18 +8,18 @@ int main()
     texture.create(800, 600);
     texture.clear(Color::White);
 
-    Client client(&texture, &window);
+    Client client;
    
     Sprite spr(texture.getTexture());
     int index = 0;
 
-    thread th([&client]() {client.Draw(); });
-    thread thColors([&client]() {client.ChangeColor(); });
+    thread th([&]() {client.Draw(&texture); });
+    thread thColors([&]() {client.ChangeColor(&texture); });
     //thread thReceiving([&client]() {client.ReceiveCoordinates(); });
     
     while (window.isOpen())
     {
-        client.GetMousePos();
+        client.GetMousePos(&window);
         Event event;
 
         while (window.pollEvent(event))
@@ -40,7 +40,7 @@ int main()
                 }*/
             if (client.GetDraw())
             {
-                client.FillPacket();
+                //client.FillPacket();
                 client.SendCoordinates();
             } 
         }

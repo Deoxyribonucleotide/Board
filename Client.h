@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include<SFML/Network.hpp>
+#include"Rect.h"
 #include<iostream>
 #include<vector>
 #include<thread>
@@ -13,9 +14,9 @@ class Client
 {
 public:
 
-	Client(RenderTexture* texture, RenderWindow* window);
+	Client();
 
-	void GetMousePos();
+	void GetMousePos(RenderWindow* window);
 
 	bool GetDraw();
 
@@ -31,25 +32,16 @@ public:
 
 	void FillPacket();
 
-	void ChangeColor();
+	void ChangeColor(RenderTexture* texture);
 
-	void Draw();
+	void Draw(RenderTexture* texture);
 
 private:
 
-	int mouseX = 0;
-	int mouseY = 0;
 	bool draw = true;
 
-	Vector2i pixelPos;
-	Vector2f Pos;
-	Vector2f Pos2;
-
-	vector<RectangleShape> rectangles{};
-	RectangleShape rect;
-
-	RenderTexture *texture;
-	RenderWindow *window;
+	vector<dl::Rect> rectangles{};
+	dl::Rect rect;
 
 	IpAddress IP;
 	TcpSocket socket;
@@ -59,7 +51,5 @@ private:
 	Packet packet;
 	Packet packet2;
 	//string str;
-
-	Color color;
 };
 
