@@ -1,13 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include<SFML/Network.hpp>
-#include"Rect.h"
 #include<iostream>
 #include<vector>
+#include"Line.h"
 #include<thread>
 #include<string>
 #pragma once
 
-using namespace sf;
 using namespace std;
 
 class Client
@@ -16,40 +15,23 @@ public:
 
 	Client();
 
-	void GetMousePos(RenderWindow* window);
+	sf::IpAddress GetMyIp();
 
-	bool GetDraw();
+	void Send(sf::Packet packet);
 
-	void ChangeDraw();
+	void FillPacket(sf::Vector2i position);
 
-	RectangleShape GetRectangle(int index);
-	
-	void SetRectanglePos(int index);
-
-	void SendCoordinates();
-
-	void ReceiveCoordinates();
-
-	void FillPacket();
-
-	void ChangeColor(RenderTexture* texture);
-
-	void Draw(RenderTexture* texture);
+	void Receive(dl::Line& line);
 
 private:
-
-	bool draw = true;
-
-	vector<dl::Rect> rectangles{};
-	dl::Rect rect;
-
-	IpAddress IP;
-	TcpSocket socket;
-	int port;
-	unsigned short serverport = 2000;
-
-	Packet packet;
-	Packet packet2;
-	//string str;
+	sf::UdpSocket socket;
+	sf::UdpSocket socket2;
+	sf::IpAddress _localip;
+	unsigned short port = 54001;
+	unsigned short port2 = 54000;
+	sf::Packet packet;
+	sf::Packet packet2;
+	vector<sf::Vector2i> pos;
+	int i;
 };
 

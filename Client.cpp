@@ -2,82 +2,68 @@
 
 Client::Client()
 {
-    for (int i = 0; i < 10; i++)
+    _localip = sf::IpAddress::getLocalAddress();
+    
+    cin >> i;
+    if (i == 2)
     {
-        rectangles.push_back(rect);
+        cin >> port2;
+        if (socket.bind(port2) != sf::Socket::Done)
+            cout << "can not bind a socket" << endl;
+        socket.setBlocking(false);
     }
-    IP = IpAddress::getLocalAddress();
-    cout << IP << endl;
-    port = 3000;
-    socket.setBlocking(false);
-    cout << socket.getLocalPort() << endl;
-    socket.connect(IP, port);
+       
+    else
+    {
+        cin >> port;
+        if (socket2.bind(port) != sf::Socket::Done)
+            cout << "can not bind a socket" << endl;
+        socket2.setBlocking(false);
+    }
 
+    cout << _localip << endl;
+
+    pos.push_back(Vector2i(0, 0));
 }
 
-void Client::GetMousePos(RenderWindow* window)
+sf::IpAddress Client::GetMyIp()
 {
-    rectangles[0].GetMousePos(window);
+    return _localip;
 }
 
-bool Client::GetDraw()
+void Client::Send(sf::Packet packet)
 {
-    return draw;
-}
+    if(i==2)
+        socket2.send(packet, _localip, port);
+    else
+        socket.send(packet, _localip, port2);
 
-void Client::ChangeDraw()
-{
-    draw = !draw;
-}
-
-RectangleShape Client::GetRectangle(int index)
-{
-    return rectangles[index].GetRectangle();
-}
-
-void Client::SetRectanglePos(int index)
-{
-    rectangles[index].SetRectanglePos();
-}
-
-void Client::SendCoordinates()
-{
-    socket.send(packet);
     packet.clear();
 }
-//fill packet
-/*void Client::FillPacket()
-{
-    packet << mouseX << mouseY;
-}*/
 
-void Client::ChangeColor(RenderTexture* texture)
+void Client::FillPacket(sf::Vector2i position)
 {
-    cout << "thread color" << endl;
-    while (1)
-        rectangles[0].ChangeColor(texture);
+    packet << position.x << position.y;
+
+    Client::Send(packet);
 }
 
-void Client::Draw(RenderTexture* texture)
+void Client::Receive(dl::Line& line)
 {
-    cout << "thread draw" << endl;
-    while (true)
+    if (i == 2)
     {
-        rectangles[0].SetRectanglePos();
-        texture->draw(rectangles[0].GetRectangle());
-    } 
-}
-
-/*void Client::ReceiveCoordinates()
-{
-    while (true)
-    {
-        socket.receive(packet2);
-        if (packet2 >> Pos2.x >> Pos2.y)
-        {
-            rectangles[1].setPosition(Pos2.x, 600 - Pos2.y);
-            packet2.clear();
-            texture->draw(rectangles[1]);
-        }
+        socket.receive(packet2, _localip, port2);
+            if (packet2 >> pos[0].x >> pos[0].y)
+                line.SetPosition(pos);
     }
-}*/
+    else
+    {
+        socket2.receive(packet2, _localip, port);
+        if (packet2 >> pos[0].x >> pos[0].y)
+            line.SetPosition(pos);
+    }
+    //cout << packet2.getDataSize();
+    packet2.clear();
+    
+}
+
