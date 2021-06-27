@@ -24,13 +24,13 @@ public:
 	void Receive(dl::Line& line);
 
 private:
+	vector<sf::UdpSocket> sockets;
 	sf::UdpSocket socket;
-	sf::UdpSocket socket2;
 	sf::IpAddress _localip;
-	unsigned short port = 54001;
-	unsigned short port2 = 54000;
+	vector<unsigned short> ports;
+	unsigned short port;
+	vector<sf::Packet> packets;
 	sf::Packet packet;
-	sf::Packet packet2;
 	vector<sf::Vector2i> pos;
 	int i;
 };

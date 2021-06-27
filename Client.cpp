@@ -3,27 +3,27 @@
 Client::Client()
 {
     _localip = sf::IpAddress::getLocalAddress();
-    
-    cin >> i;
-    if (i == 2)
-    {
-        cin >> port2;
-        if (socket.bind(port2) != sf::Socket::Done)
-            cout << "can not bind a socket" << endl;
-        socket.setBlocking(false);
-    }
-       
-    else
-    {
-        cin >> port;
-        if (socket2.bind(port) != sf::Socket::Done)
-            cout << "can not bind a socket" << endl;
-        socket2.setBlocking(false);
-    }
+    ports.push_back(port);
+    ports.push_back(port);
+    ports[0] = 54000;
+    ports[1] = 54001;
+    sockets.push_back(socket);
+    sockets.push_back(socket);
+
+    sockets[0].setBlocking(false);
+    sockets[0].bind(ports[0]);
+
+    sockets[1].setBlocking(false);
+    sockets[1].bind(ports[1]);
+
+    packets.push_back(packet);
+    packets.push_back(packet);
 
     cout << _localip << endl;
 
     pos.push_back(Vector2i(0, 0));
+
+    cin >> i;
 }
 
 sf::IpAddress Client::GetMyIp()
@@ -34,36 +34,36 @@ sf::IpAddress Client::GetMyIp()
 void Client::Send(sf::Packet packet)
 {
     if(i==2)
-        socket2.send(packet, _localip, port);
+        sockets[0].send(packet, _localip, ports[1]);
     else
-        socket.send(packet, _localip, port2);
+        sockets[1].send(packet, _localip, ports[0]);
 
     packet.clear();
 }
 
 void Client::FillPacket(sf::Vector2i position)
 {
-    packet << position.x << position.y;
+    packets[0] << position.x << position.y;
 
-    Client::Send(packet);
+    Client::Send(packets[0]);
 }
 
 void Client::Receive(dl::Line& line)
 {
     if (i == 2)
     {
-        socket.receive(packet2, _localip, port2);
-            if (packet2 >> pos[0].x >> pos[0].y)
+        socket.receive(packets[1], _localip, port);
+            if (packets[1] >> pos[0].x >> pos[0].y)
                 line.SetPosition(pos);
     }
     else
     {
-        socket2.receive(packet2, _localip, port);
-        if (packet2 >> pos[0].x >> pos[0].y)
+        sockets[1].receive(packets[1], _localip, port);
+        if (packets[1] >> pos[0].x >> pos[0].y)
             line.SetPosition(pos);
     }
     //cout << packet2.getDataSize();
-    packet2.clear();
+    packets[1].clear();
     
 }
 
